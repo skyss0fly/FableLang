@@ -1,0 +1,9 @@
+/# This is a Comment
+
+$word = "Hello World"
+echo $word
+
+
+#* 
+This is a Block Comment
+*#
