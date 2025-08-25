@@ -1,14 +1,18 @@
-/# This is a Comment
+implement math
 
-$word = "Hello World"
+/# this is a Single Line Comment
+
+$word = "Hello World, this is a Test!"
 echo $word
 
-
-#* 
-This is a Block Comment
+#*
+this is a Block Comment!
 *#
 
 $user = [$name = "skyss0fly", $age = 17]
 
 echo $user.$name
 echo $user.$age
+
+echo math.sqrt(16)
+echo math.pow(2,3)
