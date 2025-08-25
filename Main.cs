@@ -315,26 +315,22 @@ public class Interpreter
 {
     private readonly Dictionary<string, Value> _env = new(StringComparer.Ordinal);
 	
-	void LoadLibrary(string dllPath)
+	public void LoadLibrary()
 {
-	var mathdllPath = @"C:\Libraries\FabMath\bin\Debug\net8.0\FabMath.dll";
-    var assembly = Assembly.LoadFrom(mathdllPath);
+    var mathDllPath = @"C:\Libraries\FabMath\bin\Debug\net8.0\FabMath.dll";
+    var assembly = Assembly.LoadFrom(mathDllPath);
     var mathType = assembly.GetType("FabMath.MathLibrary");
     var methods = mathType.GetMethods(BindingFlags.Public | BindingFlags.Static);
 
-    var mathDict = new Dictionary<string, Func<double[], double>>();
-    foreach(var method in methods)
+    var mathMap = new VMap();
+    foreach (var method in methods)
     {
-        mathDict[method.Name.ToLower()] = (args) =>
-        {
-            var result = method.Invoke(null, args.Cast<object>().ToArray());
-            return Convert.ToDouble(result);
-        };
+        // placeholder; you can wrap methods to callable delegates later
+        mathMap.Fields[method.Name.ToLower()] = new VString($"[native method {method.Name}]");
     }
 
-    // Store mathDict in interpreter environment as "math"
-    Environment["math"] = mathDict;
-}
+    _env["math"] = mathMap;
+	}
 
     public void Execute(IEnumerable<Stmt> stmts)
     {
