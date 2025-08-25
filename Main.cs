@@ -20,7 +20,7 @@
 //   #*
 //   This is a Block Comment
 //   *#
-//   $user = [$name = "skyss0fly", $age = 17]
+//   $user = [$name = "Sebastian", $age = 17]
 //   echo $user.$name
 
 
@@ -30,6 +30,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 
 namespace FabLang
@@ -313,6 +314,27 @@ public class VMap : Value { public Dictionary<string, Value> Fields = new(String
 public class Interpreter
 {
     private readonly Dictionary<string, Value> _env = new(StringComparer.Ordinal);
+	
+	void LoadLibrary(string dllPath)
+{
+	var mathdllPath = @"C:\Libraries\FabMath\bin\Debug\net8.0\FabMath.dll";
+    var assembly = Assembly.LoadFrom(mathdllPath);
+    var mathType = assembly.GetType("FabMath.MathLibrary");
+    var methods = mathType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+
+    var mathDict = new Dictionary<string, Func<double[], double>>();
+    foreach(var method in methods)
+    {
+        mathDict[method.Name.ToLower()] = (args) =>
+        {
+            var result = method.Invoke(null, args.Cast<object>().ToArray());
+            return Convert.ToDouble(result);
+        };
+    }
+
+    // Store mathDict in interpreter environment as "math"
+    Environment["math"] = mathDict;
+}
 
     public void Execute(IEnumerable<Stmt> stmts)
     {
@@ -370,12 +392,13 @@ public static class Program
     {
         if (args.Length == 0)
         {
-            Console.WriteLine("FabLang v0.1 — usage: dotnet run -- <file.fab>");
+            Console.WriteLine("FableLang v0.1 — usage: dotnet run -- <file.fab>");
             Console.WriteLine("Running demo...\n");
             var demo = "$word = \"Hello World\"\n" +
                        "echo $word\n" +
                        "$user = [$name = \"skyss0fly\", $age = 17]\n" +
-                       "echo $user.$name\n";
+                       "echo $user.$name\n"+
+					   "echo \"FableLang Made by skyss0fly!\"";
             RunSource(demo);
             return;
         }
@@ -406,5 +429,4 @@ public static class Program
 
 
 }
-
 
