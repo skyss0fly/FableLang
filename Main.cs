@@ -98,6 +98,8 @@ public class Lexer
 
             switch (c)
             {
+				case ')': Next(); toks.Add(new Token(TokenType.RPAREN, ')', line,col)); break;
+				case '(': Next(); toks.Add(new Token(TokenType.LPAREN, '(', line,col)); break;
                 case '$': Next(); toks.Add(new Token(TokenType.DOLLAR, "$", line, col)); break;
                 case '=': Next(); toks.Add(new Token(TokenType.EQUAL, "=", line, col)); break;
                 case '[': Next(); toks.Add(new Token(TokenType.LBRACKET, "[", line, col)); break;
@@ -425,4 +427,3 @@ public static class Program
 
 
 }
-
