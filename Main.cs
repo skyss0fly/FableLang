@@ -20,7 +20,7 @@
 //   #*
 //   This is a Block Comment
 //   *#
-//   $user = [$name = "Sebastian", $age = 17]
+//   $user = [$name = "skyss0fly", $age = 17]
 //   echo $user.$name
 
 
