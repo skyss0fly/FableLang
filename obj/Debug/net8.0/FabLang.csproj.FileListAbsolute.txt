@@ -1,0 +1,14 @@
+C:\FabLang\bin\Debug\net8.0\FabLang.exe
+C:\FabLang\bin\Debug\net8.0\FabLang.deps.json
+C:\FabLang\bin\Debug\net8.0\FabLang.runtimeconfig.json
+C:\FabLang\bin\Debug\net8.0\FabLang.dll
+C:\FabLang\bin\Debug\net8.0\FabLang.pdb
+C:\FabLang\obj\Debug\net8.0\FabLang.GeneratedMSBuildEditorConfig.editorconfig
+C:\FabLang\obj\Debug\net8.0\FabLang.AssemblyInfoInputs.cache
+C:\FabLang\obj\Debug\net8.0\FabLang.AssemblyInfo.cs
+C:\FabLang\obj\Debug\net8.0\FabLang.csproj.CoreCompileInputs.cache
+C:\FabLang\obj\Debug\net8.0\FabLang.dll
+C:\FabLang\obj\Debug\net8.0\refint\FabLang.dll
+C:\FabLang\obj\Debug\net8.0\FabLang.pdb
+C:\FabLang\obj\Debug\net8.0\FabLang.genruntimeconfig.cache
+C:\FabLang\obj\Debug\net8.0\ref\FabLang.dll
