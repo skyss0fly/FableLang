@@ -1,48 +1,16 @@
+
 C:\FabLang>dotnet run -- test.fab
-C:\FabLang\obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs(4,12): error CS0579: Duplicate 'global::Syst
-em.Runtime.Versioning.TargetFrameworkAttribute' attribute [C:\FabLang\FabLang.csproj]
+C:\FabLang\Program.cs(321,20): error CS0103: The name 'Assembly' does not exist in the current context [C:\FabLang\FabLang.csproj]
+C:\FabLang\Program.cs(323,39): error CS0103: The name 'BindingFlags' does not exist in the current context [C:\FabLang\FabLang.csproj]
+C:\FabLang\Program.cs(323,61): error CS0103: The name 'BindingFlags' does not exist in the current context [C:\FabLang\FabLang.csproj]
+C:\FabLang\Program.cs(336,5): error CS0119: 'Environment' is a type, which is not valid in the given context [C:\FabLang\FabLang.csproj]
 
 The build failed. Fix the build errors and run again.
 
+C:\FabLang>dotnet run -- test.fab
+C:\FabLang\Program.cs(336,5): error CS0119: 'Environment' is a type, which is not valid in the given context [C:\FabLang\FabLang.csproj]
+C:\FabLang\Program.cs(323,19): warning CS8602: Dereference of a possibly null reference. [C:\FabLang\FabLang.csproj]
 
-"C:\FabLang\bin"
-"C:\FabLang\FabMath"
-"C:\FabLang\obj"
-"C:\FabLang\FabLang.csproj"
-"C:\FabLang\Program.cs"
-"C:\FabLang\test.fab"
-"C:\FabLang\FabMath.dll"
+The build failed. Fix the build errors and run again.
 
-
-"C:\FabLang\FabMath\bin"
-"C:\FabLang\FabMath\obj"
-"C:\FabLang\FabMath\FabMath.csproj"
-"C:\FabLang\FabMath\MathLibrary.cs"
-
-"C:\FabLang\FabMath\obj\Debug"
-"C:\FabLang\FabMath\obj\FabMath.csproj.nuget.dgspec.json"
-"C:\FabLang\FabMath\obj\FabMath.csproj.nuget.g.props"
-"C:\FabLang\FabMath\obj\FabMath.csproj.nuget.g.targets"
-"C:\FabLang\FabMath\obj\project.assets.json"
-"C:\FabLang\FabMath\obj\project.nuget.cache"
-
-
-"C:\FabLang\FabMath\obj\Debug\net8.0\ref"
-"C:\FabLang\FabMath\obj\Debug\net8.0\refint"
-"C:\FabLang\FabMath\obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.AssemblyInfo.cs"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.AssemblyInfoInputs.cache"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.assets.cache"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.csproj.CoreCompileInputs.cache"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.csproj.FileListAbsolute.txt"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.dll"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.GeneratedMSBuildEditorConfig.editorconfig"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.GlobalUsings.g.cs"
-"C:\FabLang\FabMath\obj\Debug\net8.0\FabMath.pdb"
-
-"C:\FabLang\FabMath\obj\Debug\net8.0\refint\FabMath.dll"
-"C:\FabLang\FabMath\obj\Debug\net8.0\ref\FabMath.dll"
-
-"C:\FabLang\FabMath\bin\Debug\net8.0\FabMath.deps.json"
-"C:\FabLang\FabMath\bin\Debug\net8.0\FabMath.dll"
-"C:\FabLang\FabMath\bin\Debug\net8.0\FabMath.pdb"
+C:\FabLang>
