@@ -1,4 +1,4 @@
-implement math
+/# implement math
 
 /# this is a Single Line Comment
 
@@ -14,5 +14,8 @@ $user = [$name = "skyss0fly", $age = 17]
 echo $user.$name
 echo $user.$age
 
+#*
+TODO: Finalise it
 echo math.sqrt(16)
 echo math.pow(2,3)
+*#
