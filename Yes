@@ -1,16 +1,275 @@
+// FabLang v0.1 – Minimal interpreter in C#
+// Features:
+// - File extension: .fab
+// - Single-line comments: /# ... (to end of line)
+// - Block comments: #* ... *#
+// - Variables: $name = "skyss0fly", $age = 17
+// - Nested data objects via brackets: $user = [$name = "skyss0fly", $age = 17]
+// - Dot access: echo $user.$name
+// - echo 
+// - Function calls: math.sqrt(16), math.pow(2,3)
+//
+// Usage:
+//   dotnet run -- path/to/script.fab
 
-C:\FabLang>dotnet run -- test.fab
-C:\FabLang\Program.cs(321,20): error CS0103: The name 'Assembly' does not exist in the current context [C:\FabLang\FabLang.csproj]
-C:\FabLang\Program.cs(323,39): error CS0103: The name 'BindingFlags' does not exist in the current context [C:\FabLang\FabLang.csproj]
-C:\FabLang\Program.cs(323,61): error CS0103: The name 'BindingFlags' does not exist in the current context [C:\FabLang\FabLang.csproj]
-C:\FabLang\Program.cs(336,5): error CS0119: 'Environment' is a type, which is not valid in the given context [C:\FabLang\FabLang.csproj]
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Reflection;
+using System.Linq;
 
-The build failed. Fix the build errors and run again.
+namespace FabLang
+{
+    public enum TokenType
+    {
+        EOF,
+        DOLLAR, IDENT, NUMBER, STRING,
+        EQUAL, LBRACKET, RBRACKET, COMMA, DOT,
+        LPAREN, RPAREN,
+        KEYWORD_ECHO,
+        NEWLINE
+    }
 
-C:\FabLang>dotnet run -- test.fab
-C:\FabLang\Program.cs(336,5): error CS0119: 'Environment' is a type, which is not valid in the given context [C:\FabLang\FabLang.csproj]
-C:\FabLang\Program.cs(323,19): warning CS8602: Dereference of a possibly null reference. [C:\FabLang\FabLang.csproj]
+    public class Token
+    {
+        public TokenType Type { get; }
+        public string Lexeme { get; }
+        public int Line { get; }
+        public int Col { get; }
+        public Token(TokenType type, string lexeme, int line, int col)
+        { Type = type; Lexeme = lexeme; Line = line; Col = col; }
+        public override string ToString() => $"{Type} '{Lexeme}' @ {Line}:{Col}";
+    }
 
-The build failed. Fix the build errors and run again.
+    public class Lexer
+    {
+        private readonly string _src;
+        private int _i = 0, _line = 1, _col = 1;
 
-C:\FabLang>
+        public Lexer(string src)
+        {
+            _src = StripComments(src);
+        }
+
+        private static string StripComments(string s)
+        {
+            s = Regex.Replace(s, @"#\*[\s\S]*?\*#", "", RegexOptions.Multiline);
+            s = Regex.Replace(s, @"/#[^\n\r]*", "");
+            return s;
+        }
+
+        private bool End => _i >= _src.Length;
+        private char Peek(int k = 0) => (_i + k < _src.Length) ? _src[_i + k] : '\0';
+        private char Next()
+        {
+            if (End) return '\0';
+            var c = _src[_i++];
+            if (c == '\n') { _line++; _col = 1; } else { _col++; }
+            return c;
+        }
+
+        public List<Token> Tokenize()
+        {
+            var toks = new List<Token>();
+            while (!End)
+            {
+                char c = Peek();
+                if (c == ' ' || c == '\t' || c == '\r') { Next(); continue; }
+                if (c == '\n') { Next(); toks.Add(new Token(TokenType.NEWLINE, "\\n", _line, _col)); continue; }
+
+                int line = _line, col = _col;
+
+                switch (c)
+                {
+                    case '(': Next(); toks.Add(new Token(TokenType.LPAREN, "(", line, col)); break;
+                    case ')': Next(); toks.Add(new Token(TokenType.RPAREN, ")", line, col)); break;
+                    case '$': Next(); toks.Add(new Token(TokenType.DOLLAR, "$", line, col)); break;
+                    case '=': Next(); toks.Add(new Token(TokenType.EQUAL, "=", line, col)); break;
+                    case '[': Next(); toks.Add(new Token(TokenType.LBRACKET, "[", line, col)); break;
+                    case ']': Next(); toks.Add(new Token(TokenType.RBRACKET, "]", line, col)); break;
+                    case ',': Next(); toks.Add(new Token(TokenType.COMMA, ",", line, col)); break;
+                    case '.': Next(); toks.Add(new Token(TokenType.DOT, ".", line, col)); break;
+                    case '"': toks.Add(LexString()); break;
+                    default:
+                        if (char.IsDigit(c) || (c == '-' && char.IsDigit(Peek(1))))
+                        {
+                            toks.Add(LexNumber());
+                        }
+                        else if (char.IsLetter(c) || c == '_')
+                        {
+                            var ident = LexIdentifier();
+                            if (ident.Lexeme == "echo") ident = new Token(TokenType.KEYWORD_ECHO, ident.Lexeme, ident.Line, ident.Col);
+                            toks.Add(ident);
+                        }
+                        else throw new Exception($"Unexpected character '{c}' at {line}:{col}");
+                        break;
+                }
+            }
+            toks.Add(new Token(TokenType.EOF, "", _line, _col));
+            return toks;
+        }
+
+        private Token LexString()
+        {
+            int line = _line, col = _col;
+            var sb = new StringBuilder();
+            Next();
+            while (!End)
+            {
+                char c = Next();
+                if (c == '"') break;
+                if (c == '\\')
+                {
+                    char n = Next();
+                    sb.Append(n switch
+                    {
+                        'n' => '\n',
+                        'r' => '\r',
+                        't' => '\t',
+                        '"' => '"',
+                        '\\' => '\\',
+                        _ => n
+                    });
+                }
+                else sb.Append(c);
+            }
+            return new Token(TokenType.STRING, sb.ToString(), line, col);
+        }
+
+        private Token LexNumber()
+        {
+            int line = _line, col = _col;
+            var sb = new StringBuilder();
+            if (Peek() == '-') sb.Append(Next());
+            while (char.IsDigit(Peek())) sb.Append(Next());
+            if (Peek() == '.')
+            {
+                sb.Append(Next());
+                while (char.IsDigit(Peek())) sb.Append(Next());
+            }
+            return new Token(TokenType.NUMBER, sb.ToString(), line, col);
+        }
+
+        private Token LexIdentifier()
+        {
+            int line = _line, col = _col;
+            var sb = new StringBuilder();
+            while (char.IsLetterOrDigit(Peek()) || Peek() == '_') sb.Append(Next());
+            return new Token(TokenType.IDENT, sb.ToString(), line, col);
+        }
+    }
+
+    // AST
+    public abstract class Stmt { }
+    public class StmtEcho : Stmt { public Expr Value; public StmtEcho(Expr v) { Value = v; } }
+    public class StmtAssign : Stmt { public string Name; public Expr Value; public StmtAssign(string n, Expr v) { Name = n; Value = v; } }
+
+    public abstract class Expr { }
+    public class ExprString : Expr { public string Value; public ExprString(string v) { Value = v; } }
+    public class ExprNumber : Expr { public double Value; public ExprNumber(double v) { Value = v; } }
+    public class ExprVarRef : Expr { public string Name; public ExprVarRef(string n) { Name = n; } }
+    public class ExprPath : Expr { public Expr Base; public string Key; public ExprPath(Expr b, string k) { Base = b; Key = k; } }
+    public class ExprMap : Expr { public List<(string key, Expr value)> Entries = new(); }
+    public class ExprCall : Expr { public Expr Callee; public List<Expr> Args; public ExprCall(Expr c, List<Expr> a) { Callee = c; Args = a; } }
+
+    public class Parser
+    {
+        private readonly List<Token> _toks; private int _p = 0;
+        public Parser(List<Token> toks) { _toks = toks; }
+
+        private Token Peek(int k = 0) => (_p + k < _toks.Count) ? _toks[_p + k] : _toks[^1];
+        private Token Advance() => _toks[_p++];
+        private bool Match(TokenType t) { if (Peek().Type == t) { Advance(); return true; } return false; }
+        private Token Expect(TokenType t, string msg) { var tok = Peek(); if (tok.Type != t) throw new Exception($"{msg} at {tok.Line}:{tok.Col}"); return Advance(); }
+
+        public List<Stmt> Parse()
+        {
+            var list = new List<Stmt>();
+            while (Peek().Type != TokenType.EOF)
+            {
+                if (Peek().Type == TokenType.NEWLINE) { Advance(); continue; }
+                list.Add(ParseStatement());
+                if (Peek().Type == TokenType.NEWLINE) Advance();
+            }
+            return list;
+        }
+
+        private Stmt ParseStatement()
+        {
+            if (Peek().Type == TokenType.KEYWORD_ECHO)
+            {
+                Advance();
+                var e = ParseExpr();
+                return new StmtEcho(e);
+            }
+            if (Peek().Type == TokenType.DOLLAR)
+            {
+                Advance();
+                string name = Expect(TokenType.IDENT, "Expected variable name after $").Lexeme;
+                Expect(TokenType.EQUAL, "Expected '=' after variable");
+                var value = ParseExpr();
+                return new StmtAssign(name, value);
+            }
+            throw new Exception($"Unexpected token {Peek()}");
+        }
+
+        private Expr ParseExpr()
+        {
+            var expr = ParsePrimary();
+            while (true)
+            {
+                if (Match(TokenType.DOT))
+                {
+                    var key = Expect(TokenType.IDENT, "Expected identifier after '.'").Lexeme;
+                    expr = new ExprPath(expr, key);
+                }
+                else if (Match(TokenType.LPAREN))
+                {
+                    var args = new List<Expr>();
+                    if (!Match(TokenType.RPAREN))
+                    {
+                        do
+                        {
+                            args.Add(ParseExpr());
+                        } while (Match(TokenType.COMMA));
+                        Expect(TokenType.RPAREN, "Expected ')' after function arguments");
+                    }
+                    expr = new ExprCall(expr, args);
+                }
+                else break;
+            }
+            return expr;
+        }
+
+        private Expr ParsePrimary()
+        {
+            var t = Peek();
+            switch (t.Type)
+            {
+                case TokenType.STRING: Advance(); return new ExprString(t.Lexeme);
+                case TokenType.NUMBER: Advance(); double.TryParse(t.Lexeme, NumberStyles.Float, CultureInfo.InvariantCulture, out var n); return new ExprNumber(n);
+                case TokenType.DOLLAR: Advance(); string name = Expect(TokenType.IDENT, "Expected variable name after $").Lexeme; return new ExprVarRef(name);
+                case TokenType.LBRACKET: return ParseMapLiteral();
+                default: throw new Exception($"Unexpected token in expression: {t}");
+            }
+        }
+
+        private Expr ParseMapLiteral()
+        {
+            Expect(TokenType.LBRACKET, "Expected '['");
+            var map = new ExprMap();
+            while (Peek().Type != TokenType.RBRACKET)
+            {
+                Expect(TokenType.DOLLAR, "Expected '$' to start key in map literal");
+                var key = Expect(TokenType.IDENT, "Expected identifier after '$' in map literal").Lexeme;
+                Expect(TokenType.EQUAL, "Expected '=' after key in map literal");
+                var val = ParseExpr();
+                map.Entries.Add((key, val));
+                if (Peek().Type == TokenType.COMMA) Advance();
+                else if (Peek().Type == TokenType.RBRACKET) {
+
+
+
