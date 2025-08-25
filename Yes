@@ -1,3 +1,5 @@
- var assembly = Assembly.LoadFrom(dllPath);
-    var mathType = assembly.GetType("FabMath.MathLibrary");
-    var methods = mathType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+C:\FabLang>dotnet run -- test.fab
+C:\FabLang\obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs(4,12): error CS0579: Duplicate 'global::Syst
+em.Runtime.Versioning.TargetFrameworkAttribute' attribute [C:\FabLang\FabLang.csproj]
+
+The build failed. Fix the build errors and run again.
