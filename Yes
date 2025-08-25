@@ -1,0 +1,21 @@
+using System.Reflection;
+
+void LoadLibrary(string dllPath)
+{
+    var assembly = Assembly.LoadFrom(dllPath);
+    var mathType = assembly.GetType("FabMath.MathLibrary");
+    var methods = mathType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+
+    var mathDict = new Dictionary<string, Func<double[], double>>();
+    foreach(var method in methods)
+    {
+        mathDict[method.Name.ToLower()] = (args) =>
+        {
+            var result = method.Invoke(null, args.Cast<object>().ToArray());
+            return Convert.ToDouble(result);
+        };
+    }
+
+    // Store mathDict in interpreter environment as "math"
+    Environment["math"] = mathDict;
+}
