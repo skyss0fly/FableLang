@@ -6,4 +6,5 @@ Some Early Snippets
 <img width="474" height="150" alt="image" src="https://github.com/user-attachments/assets/bdb59d9b-b7b6-401b-9825-9f1aa98cbeff" />
 
 
-this project depends on [FableLibraries](https://github.com/skyss0fly/FableLibraries)
+> [!Note]
+> this project depends on [FableLibraries](https://github.com/skyss0fly/FableLibraries) if Using Libraries such as Math
