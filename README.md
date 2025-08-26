@@ -9,7 +9,7 @@ Syntax: PHP-inspired ($variable = value, function definitions, etc.)
 Formatting: YAML-like indentation and structure for readability.
 
 
-Dependencies: Uses [FableLibraries](https://github.com/FableLibraries) for extended functionality like math operations.
+Dependencies: Uses [FableLibraries](https://github.com/skyss0fly/FableLibraries) for extended functionality like math operations.
 
 # Early Snippets
 <img width="316" height="111" alt="image" src="https://github.com/user-attachments/assets/8d35fe2d-1af0-4019-a3e4-4368dd137c72" />
