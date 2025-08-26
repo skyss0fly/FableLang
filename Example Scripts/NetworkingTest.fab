@@ -1,0 +1,8 @@
+implement Network
+
+class NetworkTest (
+
+public func(AcceptTCPClient(Network.TCP))[
+/# code here *#
+]
+)
